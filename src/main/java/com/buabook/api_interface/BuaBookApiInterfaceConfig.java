@@ -19,7 +19,7 @@ import com.buabook.api_interface.enums.EBrokerCommands;
 import com.buabook.api_interface.enums.EOrderType;
 import com.buabook.api_interface.helpers.ThreadPoolTaskRejectedHandler;
 import com.buabook.api_interface.inbound.IJsonRequestValidator;
-import com.buabook.api_interface.inbound.validators.RequestOrderValidator;
+import com.buabook.api_interface.inbound.validators.RequestAbortValidator;
 import com.buabook.api_interface.inbound.validators.CancelAllValidator;
 import com.buabook.api_interface.inbound.validators.NewOrderValidator;
 import com.buabook.api_interface.inbound.validators.OrderCancelValidator;
@@ -67,7 +67,7 @@ public class BuaBookApiInterfaceConfig {
 	public Map<EBrokerCommands, IJsonRequestValidator> brokerRequestValidators() {
 		return ImmutableMap.<EBrokerCommands, IJsonRequestValidator>builder()
 																		.put(EBrokerCommands.ORDER_NEW, newOrderValidator())
-																		.put(EBrokerCommands.REQUEST_ABORT, new RequestOrderValidator())
+																		.put(EBrokerCommands.REQUEST_ABORT, new RequestAbortValidator())
 																		.put(EBrokerCommands.ORDER_CANCEL, new OrderCancelValidator())
 																		.put(EBrokerCommands.CANCEL_ALL, new CancelAllValidator())
 																		.build();

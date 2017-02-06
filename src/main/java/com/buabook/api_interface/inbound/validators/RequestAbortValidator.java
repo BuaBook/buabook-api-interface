@@ -13,7 +13,7 @@ import com.buabook.api_interface.inbound.IJsonRequestValidator;
 import com.google.common.collect.ImmutableList;
 
 @Component
-public class RequestOrderValidator implements IJsonRequestValidator {
+public class RequestAbortValidator implements IJsonRequestValidator {
 	
 	private static final List<String> REQUIRED_ARGUMENTS = ImmutableList.<String>builder()
 																					.add("command_to_abort")
