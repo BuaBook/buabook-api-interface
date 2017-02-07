@@ -21,7 +21,9 @@ import com.google.common.net.MediaType;
 public class Login implements Runnable {
 	private static final Logger log = Logger.getLogger(Login.class);
 	
-	private static final Long LOGIN_REATTEMPT_WAIT_MS = 2000l;
+	private static final long LOGIN_REATTEMPT_MIN_WAIT_MS = 2000l;
+	
+	private static final long LOGIN_REATTEMPT_DELAY_MS = 1000l;
 	
 	
 	@Autowired
@@ -42,6 +44,8 @@ public class Login implements Runnable {
     
     
     private JSONObject loginParams;
+    
+    private long loginFailureCount = 0l;
         
     
     @PostConstruct
@@ -61,19 +65,19 @@ public class Login implements Runnable {
 
     	JSONObject responseJson = null;
     	
-    	log.info("Attemping login [ URL: " + url + " ] [ Username: " + loginParams.getString("username") + " ]");
+    	log.info("Attemping login [ URL: " + url + " ] [ Username: " + userName + " ]" + (loginFailureCount == 0 ? "" : " [ Retry Count: " + loginFailureCount + " ]"));
     	
     	try {
     		HttpResponse response = httpClient.doPost(url, MediaType.JSON_UTF_8, loginParams.toString(), null); 
     		responseJson = HttpClient.getResponseAsJson(response);
     	} catch(HttpClientRequestFailedException | JSONException e) {
-    		log.error("Failed to login due to exception. Error - " + e.getMessage());
+    		log.error("Failed to login due to exception. Will re-attempt login. Error - " + e.getMessage());
     		reattemptLogin();
     		return;
     	}
     	
     	if((! responseJson.has("success")) || ! responseJson.getBoolean("success")) {
-			log.error("Login failed due to API error. Response: " + responseJson.toString());
+			log.error("Login failed due to API error. Will re-attempt login. Response: " + responseJson.toString());
 			reattemptLogin();
 			return;
 		}
@@ -89,15 +93,19 @@ public class Login implements Runnable {
 		try {
 			buabookWebSocket.openApiSocket();
 		} catch (Exception e) {
-			log.fatal("Could not start WebSocket to BuaBook API! Application will EXIT. Error - " + e.getMessage(), e);
-			System.exit(1);
+			log.error("Could not start WebSocket to BuaBook API. Will re-attempt login. Error - " + e.getMessage());
+			reattemptLogin();
 		}
+		
+		loginFailureCount = 0;
     }
     
     private void reattemptLogin() {
     	try {
-			Thread.sleep(LOGIN_REATTEMPT_WAIT_MS);
+			Thread.sleep(LOGIN_REATTEMPT_MIN_WAIT_MS + LOGIN_REATTEMPT_DELAY_MS * loginFailureCount);
 		} catch (InterruptedException e) {}
+    	
+    	loginFailureCount++;
     	
     	run();
     }

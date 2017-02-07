@@ -57,7 +57,7 @@ public class ApiInterfaceManagement implements IExposeToJmx {
 		return taskExecutor.getActiveCount();
 	}
 	
-	@ManagedAttribute(description = "The total number of requests sent of each supported broker command")
+	@ManagedAttribute(description = "The total number of requests sent of each supported Interface command")
 	public Map<String, Long> getApiRequestsSummary() {
 		return apiInterface.getRequestsSummary().entrySet()
 															.stream()
