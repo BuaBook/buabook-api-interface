@@ -1,3 +1,10 @@
+# Archived
+
+Please note that this repository is now archived and no longer maintained.
+
+
+----
+
 # BuaBook API Interface
 Client connectivity application to provide simplified WebSocket access to trading via BuaBook API.
 
